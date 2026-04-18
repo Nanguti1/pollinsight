@@ -3,25 +3,57 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Poll;
-use App\Models\County;
 use App\Models\Constituency;
+use App\Models\County;
+use App\Models\Poll;
 use App\Models\Position;
 use App\Models\Ward;
 use App\Services\PollService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class PollController extends Controller
 {
-    public function index()
+    public function index(Request $request): Response
     {
+        $filters = $request->validate([
+            'position_id' => 'nullable|exists:positions,id',
+            'county_id' => 'nullable|exists:counties,id',
+            'constituency_id' => 'nullable|exists:constituencies,id',
+            'ward_id' => 'nullable|exists:wards,id',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        $polls = Poll::query()
+            ->with(['position', 'county', 'constituency', 'ward'])
+            ->when($filters['position_id'] ?? null, fn ($query, $positionId) => $query->where('position_id', $positionId))
+            ->when($filters['county_id'] ?? null, fn ($query, $countyId) => $query->where('county_id', $countyId))
+            ->when($filters['constituency_id'] ?? null, fn ($query, $constituencyId) => $query->where('constituency_id', $constituencyId))
+            ->when($filters['ward_id'] ?? null, fn ($query, $wardId) => $query->where('ward_id', $wardId))
+            ->when(array_key_exists('is_active', $filters), fn ($query) => $query->where('is_active', (bool) $filters['is_active']))
+            ->orderByDesc('created_at')
+            ->get();
+
+        $counties = County::orderBy('name')->get();
+        $constituencies = Constituency::query()
+            ->when($filters['county_id'] ?? null, fn ($query, $countyId) => $query->where('county_id', $countyId))
+            ->orderBy('name')
+            ->get();
+        $wards = Ward::query()
+            ->when($filters['constituency_id'] ?? null, fn ($query, $constituencyId) => $query->where('constituency_id', $constituencyId))
+            ->orderBy('name')
+            ->get();
+
         return Inertia::render('admin/polls', [
-            'polls' => Poll::with(['position', 'county', 'constituency', 'ward'])->orderByDesc('created_at')->get(),
+            'polls' => $polls,
             'positions' => Position::orderBy('level')->orderBy('name')->get(),
-            'counties' => County::orderBy('name')->get(),
-            'constituencies' => Constituency::orderBy('name')->get(),
-            'wards' => Ward::orderBy('name')->get(),
+            'counties' => $counties,
+            'constituencies' => $constituencies,
+            'wards' => $wards,
+            'allConstituencies' => Constituency::orderBy('name')->get(),
+            'allWards' => Ward::orderBy('name')->get(),
+            'filters' => $filters,
         ]);
     }
 
