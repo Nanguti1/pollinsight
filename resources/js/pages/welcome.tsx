@@ -60,6 +60,7 @@ export default function Welcome({
 
     const currentSlide = useMemo(() => heroSlides[activeSlide], [activeSlide]);
 
+export default function Welcome({ activePolls }: { activePolls: { id: number; title: string; position: string; location: string; end_date: string }[] }) {
     return (
         <>
             <Head title="Home" />
