@@ -7,14 +7,17 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PollController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\WardController;
+use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\PageController;
+use App\Http\Controllers\Public\PollController as PublicPollController;
 use App\Http\Controllers\Public\RankingController;
 use App\Http\Controllers\Public\VoteController;
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
 
-Route::inertia('/', 'welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+Route::redirect('/contacts', '/contact', 301)->name('contacts');
 
 
 Route::inertia('/about', 'about')->name('about');
@@ -58,8 +61,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-Route::get('polls', [App\Http\Controllers\Public\PollController::class, 'index'])->name('polls.index');
-Route::get('polls/{poll}', [App\Http\Controllers\Public\PollController::class, 'show'])->name('polls.show');
+Route::get('polls', [PublicPollController::class, 'index'])->name('polls.index');
+Route::get('polls/{poll}', [PublicPollController::class, 'show'])->name('polls.show');
 Route::post('polls/{poll}/vote', [VoteController::class, 'store'])->middleware('throttle:votes,10,1')->name('polls.vote');
 Route::get('rankings', [RankingController::class, 'index'])->name('rankings.index');
 
