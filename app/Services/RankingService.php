@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class RankingService
 {
-    public function rankings(?int $positionId = null, ?int $countyId = null, ?int $constituencyId = null): Collection
+    public function rankings(?int $positionId = null, ?int $countyId = null, ?int $constituencyId = null, ?int $wardId = null): Collection
     {
         $query = Vote::query()
             ->selectRaw('aspirants.id as aspirant_id, aspirants.name, aspirants.photo, aspirants.party, positions.name as position_name, positions.level as position_level, COUNT(votes.id) as votes')
@@ -25,6 +25,10 @@ class RankingService
 
         if ($constituencyId) {
             $query->where('aspirants.constituency_id', $constituencyId);
+        }
+
+        if ($wardId) {
+            $query->where('aspirants.ward_id', $wardId);
         }
 
         return $query

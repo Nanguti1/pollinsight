@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 
-export default function RankingsIndex({ rankings, positions, counties, constituencies, filters }: { rankings: any[]; positions: any[]; counties: any[]; constituencies: any[]; filters: any }) {
+export default function RankingsIndex({ rankings, positions, counties, constituencies, wards, filters }: { rankings: any[]; positions: any[]; counties: any[]; constituencies: any[]; wards: any[]; filters: any }) {
     return (
         <>
             <Head title="Rankings" />
@@ -13,23 +13,28 @@ export default function RankingsIndex({ rankings, positions, counties, constitue
 
                 <motion.section className="rounded-3xl border border-white/10 bg-slate-950/5 p-6 shadow-sm backdrop-blur-xl">
                     <h2 className="text-xl font-semibold text-slate-950">Filters</h2>
-                    <form action="/rankings" method="get" className="mt-5 grid gap-4 sm:grid-cols-2">
-                        <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''} />
-                        <select name="position_id" defaultValue={filters.position_id ?? ''} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-400">
+                    <form action="/rankings" method="get" className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                        <select name="position_id" defaultValue={filters.position_id ?? ''} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950">
                             <option value="">All positions</option>
                             {positions.map((position) => (
                                 <option key={position.id} value={position.id}>{position.name}</option>
                             ))}
                         </select>
-                        <select name="county_id" defaultValue={filters.county_id ?? ''} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-400">
+                        <select name="county_id" defaultValue={filters.county_id ?? ''} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950">
                             <option value="">All counties</option>
                             {counties.map((county) => (
                                 <option key={county.id} value={county.id}>{county.name}</option>
                             ))}
                         </select>
-                        <select name="constituency_id" defaultValue={filters.constituency_id ?? ''} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-400">
+                        <select name="constituency_id" defaultValue={filters.constituency_id ?? ''} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950">
                             <option value="">All constituencies</option>
                             {constituencies.map((item) => (
+                                <option key={item.id} value={item.id}>{item.name}</option>
+                            ))}
+                        </select>
+                        <select name="ward_id" defaultValue={filters.ward_id ?? ''} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950">
+                            <option value="">All wards</option>
+                            {wards.map((item) => (
                                 <option key={item.id} value={item.id}>{item.name}</option>
                             ))}
                         </select>
