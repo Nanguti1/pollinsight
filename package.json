@@ -55,6 +55,7 @@
         "framer-motion": "^12.38.0",
         "globals": "^15.14.0",
         "input-otp": "^1.4.2",
+        "@fingerprintjs/fingerprintjs": "^4.1.0",
         "laravel-vite-plugin": "^3.0.0",
         "lucide-react": "^0.475.0",
         "react": "^19.2.0",
