@@ -17,11 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
-Route::redirect('/contacts', '/contact', 301)->name('contacts');
-
-
-Route::inertia('/about', 'about')->name('about');
-Route::inertia('/contacts', 'contacts')->name('contacts');
+Route::redirect('/contacts', '/contact', 301);
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
