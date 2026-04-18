@@ -51,7 +51,7 @@ export default function AdminDashboard({ summary }: { summary: Record<string, nu
                     {[
                         { title: 'Aspirants', href: '/admin/aspirants', description: 'Manage candidates and party alignment.' },
                         { title: 'Polls', href: '/admin/polls', description: 'Create polling rounds and review results.' },
-                        { title: 'Locations', href: '/admin/locations', description: 'Keep counties, constituencies, and wards updated.' },
+                        { title: 'Counties', href: '/admin/counties', description: 'Manage counties, constituencies, and wards.' },
                     ].map((item) => (
                         <motion.div
                             key={item.title}
