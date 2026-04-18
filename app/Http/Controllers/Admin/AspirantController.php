@@ -10,6 +10,7 @@ use App\Models\Position;
 use App\Models\Ward;
 use App\Services\AspirantService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -33,7 +34,19 @@ class AspirantController extends Controller
             ->when($filters['ward_id'] ?? null, fn ($query, $wardId) => $query->where('ward_id', $wardId))
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->map(function (Aspirant $aspirant) {
+                $photoUrl = $aspirant->photo;
+
+                if ($aspirant->photo && ! str_starts_with($aspirant->photo, 'http')) {
+                    $photoUrl = Storage::disk('public')->url($aspirant->photo);
+                }
+
+                return [
+                    ...$aspirant->toArray(),
+                    'photo_url' => $photoUrl,
+                ];
+            });
 
         $counties = County::orderBy('name')->get();
         $constituencies = Constituency::query()
@@ -61,7 +74,7 @@ class AspirantController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'photo' => 'nullable|string|max:1000',
+            'photo' => 'nullable|image|max:4096',
             'party' => 'required|string|max:255',
             'position_id' => 'required|exists:positions,id',
             'county_id' => 'nullable|exists:counties,id',
@@ -70,6 +83,10 @@ class AspirantController extends Controller
             'bio' => 'nullable|string',
             'status' => 'required|in:active,inactive',
         ]);
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('aspirants', 'public');
+        }
 
         $service->create($data);
 
@@ -80,7 +97,7 @@ class AspirantController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'photo' => 'nullable|string|max:1000',
+            'photo' => 'nullable|image|max:4096',
             'party' => 'required|string|max:255',
             'position_id' => 'required|exists:positions,id',
             'county_id' => 'nullable|exists:counties,id',
@@ -89,6 +106,14 @@ class AspirantController extends Controller
             'bio' => 'nullable|string',
             'status' => 'required|in:active,inactive',
         ]);
+
+        if ($request->hasFile('photo')) {
+            if ($aspirant->photo && ! str_starts_with($aspirant->photo, 'http')) {
+                Storage::disk('public')->delete($aspirant->photo);
+            }
+
+            $data['photo'] = $request->file('photo')->store('aspirants', 'public');
+        }
 
         $service->update($aspirant, $data);
 

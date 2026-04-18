@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             KenyanGeographySeeder::class,
+            PositionSeeder::class,
         ]);
     }
 }
