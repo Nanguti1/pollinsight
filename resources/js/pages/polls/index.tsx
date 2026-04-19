@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { motion } from 'framer-motion';
+import { useCallback, useState } from 'react';
 import PollCard from '@/components/public/poll-card';
 
 type Poll = {
@@ -11,6 +12,35 @@ type Poll = {
 };
 
 export default function PollList({ polls, positions, counties, filters }: { polls: Poll[]; positions: { id: number; name: string }[]; counties: { id: number; name: string }[]; filters: { position_id?: number; county_id?: number } }) {
+    const [availablePositions, setAvailablePositions] = useState(positions);
+    const [availableCounties, setAvailableCounties] = useState(counties);
+    const [hasLoadedFilterOptions, setHasLoadedFilterOptions] = useState(positions.length > 0 && counties.length > 0);
+
+    const loadFilterOptions = useCallback(async () => {
+        if (hasLoadedFilterOptions) {
+            return;
+        }
+
+        const response = await fetch('/polls/filter-options', {
+            headers: {
+                Accept: 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const data = (await response.json()) as {
+            positions?: { id: number; name: string }[];
+            counties?: { id: number; name: string }[];
+        };
+
+        setAvailablePositions(data.positions ?? []);
+        setAvailableCounties(data.counties ?? []);
+        setHasLoadedFilterOptions(true);
+    }, [hasLoadedFilterOptions]);
+
     return (
         <>
             <Head title="Polls" />
@@ -20,15 +50,15 @@ export default function PollList({ polls, positions, counties, filters }: { poll
                 <p className="mt-2 text-slate-600">Filter live polls by position and county, then cast your vote.</p>
 
                 <form action="/polls" method="get" className="mt-6 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
-                    <select name="position_id" defaultValue={filters.position_id ?? ''} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
+                    <select name="position_id" defaultValue={filters.position_id ?? ''} onFocus={() => void loadFilterOptions()} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
                         <option value="">All positions</option>
-                        {positions.map((position) => (
+                        {availablePositions.map((position) => (
                             <option key={position.id} value={position.id}>{position.name}</option>
                         ))}
                     </select>
-                    <select name="county_id" defaultValue={filters.county_id ?? ''} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
+                    <select name="county_id" defaultValue={filters.county_id ?? ''} onFocus={() => void loadFilterOptions()} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
                         <option value="">All counties</option>
-                        {counties.map((county) => (
+                        {availableCounties.map((county) => (
                             <option key={county.id} value={county.id}>{county.name}</option>
                         ))}
                     </select>

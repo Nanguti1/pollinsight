@@ -69,4 +69,24 @@ class PublicPagesTest extends TestCase
             ->assertSee('Nairobi Governor Tracker')
             ->assertDontSee('Mombasa Senator Tracker');
     }
+
+    public function test_polls_filter_options_endpoint_returns_expected_position_labels(): void
+    {
+        Position::create(['name' => 'Governor', 'level' => 'county']);
+        Position::create(['name' => 'Senator', 'level' => 'county']);
+        Position::create(['name' => 'Women Representative', 'level' => 'county']);
+        Position::create(['name' => 'Member of Parliament (MP)', 'level' => 'constituency']);
+        Position::create(['name' => 'Member of County Assembly (MCA)', 'level' => 'ward']);
+        Position::create(['name' => 'President', 'level' => 'national']);
+
+        $response = $this->getJson(route('polls.filter-options'));
+
+        $response->assertOk()
+            ->assertJsonPath('positions.0.name', 'Governor')
+            ->assertJsonPath('positions.1.name', 'Senator')
+            ->assertJsonPath('positions.2.name', 'Women Rep')
+            ->assertJsonPath('positions.3.name', 'MP')
+            ->assertJsonPath('positions.4.name', 'MCA')
+            ->assertJsonMissing(['name' => 'President']);
+    }
 }
