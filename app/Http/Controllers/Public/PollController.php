@@ -7,12 +7,68 @@ use App\Models\County;
 use App\Models\Poll;
 use App\Models\Position;
 use App\Services\PollService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PollController extends Controller
 {
+    /**
+     * @return array<int, array{name: string, aliases: array<int, string>}>
+     */
+    private function positionFilterDefinitions(): array
+    {
+        return [
+            ['name' => 'Governor', 'aliases' => ['Governor']],
+            ['name' => 'Senator', 'aliases' => ['Senator']],
+            ['name' => 'Women Rep', 'aliases' => ['Women Rep', 'Women Representative']],
+            ['name' => 'MP', 'aliases' => ['MP', 'Member of Parliament', 'Member of Parliament (MP)']],
+            ['name' => 'MCA', 'aliases' => ['MCA', 'Member of County Assembly', 'Member of County Assembly (MCA)']],
+        ];
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, array{id: int, name: string}>
+     */
+    private function positionFilterOptions(): Collection
+    {
+        $definitions = collect($this->positionFilterDefinitions());
+
+        $aliasLookup = [];
+        foreach ($definitions as $definition) {
+            foreach ($definition['aliases'] as $alias) {
+                $aliasLookup[mb_strtolower($alias)] = $definition['name'];
+            }
+        }
+
+        $positions = Position::query()
+            ->select(['id', 'name'])
+            ->where(function ($query) use ($aliasLookup) {
+                foreach (array_keys($aliasLookup) as $alias) {
+                    $query->orWhereRaw('LOWER(name) = ?', [$alias]);
+                }
+            })
+            ->get();
+
+        $positionsByCanonicalName = $positions->reduce(function (array $carry, Position $position) use ($aliasLookup) {
+            $canonicalName = $aliasLookup[mb_strtolower($position->name)] ?? null;
+            if (! $canonicalName || isset($carry[$canonicalName])) {
+                return $carry;
+            }
+
+            $carry[$canonicalName] = ['id' => $position->id, 'name' => $canonicalName];
+
+            return $carry;
+        }, []);
+
+        return $definitions
+            ->map(fn (array $definition) => $positionsByCanonicalName[$definition['name']] ?? null)
+            ->filter()
+            ->values();
+    }
+
     public function index(Request $request): Response
     {
         $filters = $request->validate([
@@ -41,9 +97,17 @@ class PollController extends Controller
 
         return Inertia::render('polls/index', [
             'polls' => $polls,
-            'positions' => Position::orderBy('level')->orderBy('name')->get(['id', 'name']),
+            'positions' => $this->positionFilterOptions(),
             'counties' => County::orderBy('name')->get(['id', 'name']),
             'filters' => $filters,
+        ]);
+    }
+
+    public function filterOptions(): JsonResponse
+    {
+        return response()->json([
+            'positions' => $this->positionFilterOptions(),
+            'counties' => County::orderBy('name')->get(['id', 'name']),
         ]);
     }
 

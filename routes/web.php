@@ -58,6 +58,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::get('polls', [PublicPollController::class, 'index'])->name('polls.index');
+Route::get('polls/filter-options', [PublicPollController::class, 'filterOptions'])->name('polls.filter-options');
 Route::get('polls/{poll}', [PublicPollController::class, 'show'])->name('polls.show');
 Route::post('polls/{poll}/vote', [VoteController::class, 'store'])->middleware('throttle:votes,10,1')->name('polls.vote');
 Route::get('rankings', [RankingController::class, 'index'])->name('rankings.index');
