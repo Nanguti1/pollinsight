@@ -282,7 +282,7 @@
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-CX7icwvK.css",
+    "file": "assets/app-Bd8ugM58.css",
     "name": "app",
     "names": [
       "app.css"
@@ -291,7 +291,7 @@
     "isEntry": true
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-BtD-YOuV.js",
+    "file": "assets/app-xVlYP4U7.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
@@ -358,7 +358,7 @@
     ]
   },
   "resources/js/pages/admin/aspirants.tsx": {
-    "file": "assets/aspirants-BcPPJ8Ew.js",
+    "file": "assets/aspirants-E4IHC56X.js",
     "name": "aspirants",
     "src": "resources/js/pages/admin/aspirants.tsx",
     "isDynamicEntry": true,
@@ -629,7 +629,7 @@
     ]
   },
   "resources/js/pages/polls/show.tsx": {
-    "file": "assets/show-D5znPaCG.js",
+    "file": "assets/show-Cm-bCrOT.js",
     "name": "show",
     "src": "resources/js/pages/polls/show.tsx",
     "isDynamicEntry": true,
