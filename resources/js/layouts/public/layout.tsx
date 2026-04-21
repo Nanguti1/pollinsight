@@ -16,7 +16,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.25 }}
-                    className="mx-auto w-full max-w-6xl px-6 py-10"
+                    className="mx-auto w-full max-w-7xl px-4 py-8 md:px-6 md:py-10"
                 >
                     {children}
                 </motion.main>

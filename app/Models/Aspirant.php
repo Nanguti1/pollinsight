@@ -6,10 +6,16 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['name', 'photo', 'party', 'position_id', 'county_id', 'constituency_id', 'ward_id', 'bio', 'status'])]
+#[Fillable(['name', 'photo', 'party', 'political_party_id', 'position_id', 'county_id', 'constituency_id', 'ward_id', 'bio', 'status'])]
 class Aspirant extends Model
 {
     use HasFactory;
+
+
+    public function politicalParty()
+    {
+        return $this->belongsTo(PoliticalParty::class);
+    }
 
     public function position()
     {

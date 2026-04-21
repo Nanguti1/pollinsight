@@ -17,7 +17,7 @@ export default function Navbar() {
 
     return (
         <header className="sticky top-0 z-40 border-b border-white/30 bg-white/65 backdrop-blur-xl">
-            <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
+            <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 md:px-6">
                 <Link href="/" className="font-semibold tracking-tight text-slate-950">
                     PollInsight Kenya
                 </Link>
@@ -57,7 +57,7 @@ export default function Navbar() {
                         transition={{ duration: 0.2 }}
                         className="overflow-hidden border-t border-white/30 bg-white/90 md:hidden"
                     >
-                        <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-6 py-4">
+                        <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-4 md:px-6">
                             {navigationLinks.map((item) => (
                                 <Link
                                     key={item.href}
