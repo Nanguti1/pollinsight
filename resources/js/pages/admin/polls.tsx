@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
 
 type LocationOption = { id: number; name: string; county_id?: number; constituency_id?: number };
+type PositionOption = { id: number; name: string; level: 'national' | 'county' | 'constituency' | 'ward' };
 
 export default function AdminPolls({
     polls,
@@ -15,7 +16,7 @@ export default function AdminPolls({
     filters,
 }: {
     polls: any[];
-    positions: any[];
+    positions: PositionOption[];
     counties: LocationOption[];
     constituencies: LocationOption[];
     wards: LocationOption[];
@@ -23,10 +24,14 @@ export default function AdminPolls({
     allWards: LocationOption[];
     filters: any;
 }) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    const [selectedPositionId, setSelectedPositionId] = useState<string>(positions[0] ? String(positions[0].id) : '');
     const [selectedCounty, setSelectedCounty] = useState<string>('');
     const [selectedConstituency, setSelectedConstituency] = useState<string>('');
 
-    const createConstituencies = useMemo(() => {
+    const selectedPosition = useMemo(() => positions.find((position) => String(position.id) === selectedPositionId), [positions, selectedPositionId]);
+
+    const scopedConstituencies = useMemo(() => {
         if (!selectedCounty) {
             return allConstituencies;
         }
@@ -34,13 +39,17 @@ export default function AdminPolls({
         return allConstituencies.filter((item) => String(item.county_id) === selectedCounty);
     }, [allConstituencies, selectedCounty]);
 
-    const createWards = useMemo(() => {
+    const scopedWards = useMemo(() => {
         if (!selectedConstituency) {
             return allWards;
         }
 
         return allWards.filter((item) => String(item.constituency_id) === selectedConstituency);
     }, [allWards, selectedConstituency]);
+
+    const showCountyOnly = selectedPosition?.level === 'county';
+    const showConstituencyFlow = selectedPosition?.level === 'constituency';
+    const showWardFlow = selectedPosition?.level === 'ward';
 
     return (
         <>
@@ -102,7 +111,7 @@ export default function AdminPolls({
                                         </div>
                                         <div className="flex gap-2 text-xs text-slate-500">
                                             <span>{poll.is_active ? 'Active' : 'Inactive'}</span>
-                                            <span>Ends {poll.end_date}</span>
+                                            <span>Ends {new Date(poll.end_date).toLocaleDateString('en-KE', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -113,59 +122,96 @@ export default function AdminPolls({
                     <motion.section className="rounded-3xl border border-white/10 bg-white/60 p-6 shadow-sm backdrop-blur-xl">
                         <h2 className="text-xl font-semibold text-slate-950">Create poll</h2>
                         <form action="/admin/polls" method="post" className="mt-6 space-y-4">
-                            <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''} />
+                            <input type="hidden" name="_token" value={csrfToken} />
                             <div>
                                 <label className="block text-sm font-medium text-slate-700">Title</label>
                                 <input name="title" className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm" />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-700">Position</label>
-                                <select name="position_id" className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm">
+                                <select
+                                    name="position_id"
+                                    value={selectedPositionId}
+                                    onChange={(event) => {
+                                        setSelectedPositionId(event.target.value);
+                                        setSelectedCounty('');
+                                        setSelectedConstituency('');
+                                    }}
+                                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm"
+                                >
                                     {positions.map((position) => (
                                         <option key={position.id} value={position.id}>{position.name}</option>
                                     ))}
                                 </select>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700">County</label>
-                                <select
-                                    name="county_id"
-                                    value={selectedCounty}
-                                    onChange={(event) => {
-                                        setSelectedCounty(event.target.value);
-                                        setSelectedConstituency('');
-                                    }}
-                                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm"
-                                >
-                                    <option value="">None</option>
-                                    {counties.map((county) => (
-                                        <option key={county.id} value={county.id}>{county.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700">Constituency</label>
-                                <select
-                                    name="constituency_id"
-                                    value={selectedConstituency}
-                                    onChange={(event) => setSelectedConstituency(event.target.value)}
-                                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm"
-                                >
-                                    <option value="">None</option>
-                                    {createConstituencies.map((item) => (
-                                        <option key={item.id} value={item.id}>{item.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700">Ward</label>
-                                <select name="ward_id" className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm">
-                                    <option value="">None</option>
-                                    {createWards.map((item) => (
-                                        <option key={item.id} value={item.id}>{item.name}</option>
-                                    ))}
-                                </select>
-                            </div>
+
+                            {showCountyOnly && (
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700">County</label>
+                                    <select name="county_id" value={selectedCounty} onChange={(event) => setSelectedCounty(event.target.value)} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm">
+                                        <option value="">Select county</option>
+                                        {counties.map((county) => (
+                                            <option key={county.id} value={county.id}>{county.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+
+                            {showConstituencyFlow && (
+                                <>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700">County (for narrowing constituencies)</label>
+                                        <select value={selectedCounty} onChange={(event) => { setSelectedCounty(event.target.value); setSelectedConstituency(''); }} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm">
+                                            <option value="">Select county</option>
+                                            {counties.map((county) => (
+                                                <option key={county.id} value={county.id}>{county.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700">Constituency</label>
+                                        <select name="constituency_id" value={selectedConstituency} onChange={(event) => setSelectedConstituency(event.target.value)} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm">
+                                            <option value="">Select constituency</option>
+                                            {scopedConstituencies.map((item) => (
+                                                <option key={item.id} value={item.id}>{item.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </>
+                            )}
+
+                            {showWardFlow && (
+                                <>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700">County</label>
+                                        <select value={selectedCounty} onChange={(event) => { setSelectedCounty(event.target.value); setSelectedConstituency(''); }} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm">
+                                            <option value="">Select county</option>
+                                            {counties.map((county) => (
+                                                <option key={county.id} value={county.id}>{county.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700">Constituency</label>
+                                        <select value={selectedConstituency} onChange={(event) => setSelectedConstituency(event.target.value)} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm">
+                                            <option value="">Select constituency</option>
+                                            {scopedConstituencies.map((item) => (
+                                                <option key={item.id} value={item.id}>{item.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700">Ward</label>
+                                        <select name="ward_id" className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm">
+                                            <option value="">Select ward</option>
+                                            {scopedWards.map((item) => (
+                                                <option key={item.id} value={item.id}>{item.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </>
+                            )}
+
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700">Start date</label>

@@ -6,11 +6,12 @@ export default function AdminWards({ wards, constituencies }: { wards: any[]; co
     const [search, setSearch] = useState('');
     const [query, setQuery] = useState('');
     const [showMore, setShowMore] = useState(false);
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
     const filteredWards = useMemo(() => {
-        const source = query ? wards.filter((item) => item.name.toLowerCase().includes(query.toLowerCase())) : wards;
+        const source = query ? wards.filter((item) => `${item.name} ${item.constituency?.name || ''} ${item.constituency?.county?.name || ''}`.toLowerCase().includes(query.toLowerCase())) : wards;
 
-        return showMore || query ? source : source.slice(0, 8);
+        return showMore || query ? source : source.slice(0, 12);
     }, [wards, query, showMore]);
 
     return (
@@ -33,19 +34,31 @@ export default function AdminWards({ wards, constituencies }: { wards: any[]; co
                                 }}
                                 className="flex gap-2"
                             >
-                                <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search ward" className="rounded-[5px] border border-slate-200 bg-white px-3 py-2 text-sm" />
+                                <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search ward / constituency / county" className="rounded-[5px] border border-slate-200 bg-white px-3 py-2 text-sm" />
                                 <button type="submit" className="rounded-[5px] bg-slate-950 px-3 py-2 text-sm font-semibold text-white">Search</button>
                             </form>
                         </div>
                         <div className="mt-5 grid gap-3">
                             {filteredWards.map((ward: any) => (
                                 <div key={ward.id} className="rounded-[5px] bg-white/60 p-4 shadow-sm">
-                                    <p className="font-semibold text-slate-950">{ward.name}</p>
-                                    <p className="mt-1 text-sm text-slate-600">Constituency: {ward.constituency?.name} ({ward.constituency?.county?.name})</p>
+                                    <form action={`/admin/wards/${ward.id}`} method="post" className="space-y-3">
+                                        <input type="hidden" name="_token" value={csrfToken} />
+                                        <input type="hidden" name="_method" value="put" />
+                                        <input defaultValue={ward.name} name="name" className="w-full rounded-[5px] border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-950" />
+                                        <select defaultValue={ward.constituency_id} name="constituency_id" className="w-full rounded-[5px] border border-slate-200 bg-white px-3 py-2 text-sm">
+                                            {constituencies.map((constituency) => (
+                                                <option key={constituency.id} value={constituency.id}>{constituency.name} ({constituency.county?.name})</option>
+                                            ))}
+                                        </select>
+                                        <div className="flex justify-end gap-2">
+                                            <button type="submit" className="rounded-[5px] bg-slate-950 px-3 py-1.5 text-xs font-semibold text-white">Save</button>
+                                            <button formAction={`/admin/wards/${ward.id}`} formMethod="post" name="_method" value="delete" className="rounded-[5px] border border-rose-300 px-3 py-1.5 text-xs font-semibold text-rose-600">Delete</button>
+                                        </div>
+                                    </form>
                                 </div>
                             ))}
                         </div>
-                        {!query && wards.length > 8 && (
+                        {!query && wards.length > 12 && (
                             <button type="button" onClick={() => setShowMore((value) => !value)} className="mt-4 rounded-[5px] border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700">
                                 {showMore ? 'Show less' : 'Show more'}
                             </button>
@@ -55,7 +68,7 @@ export default function AdminWards({ wards, constituencies }: { wards: any[]; co
                     <motion.section layout className="rounded-[5px] border border-white/10 bg-white/60 p-6 shadow-sm backdrop-blur-xl">
                         <h2 className="text-xl font-semibold text-slate-950">Add new ward</h2>
                         <form action="/admin/wards" method="post" className="mt-6 space-y-4">
-                            <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''} />
+                            <input type="hidden" name="_token" value={csrfToken} />
                             <div>
                                 <label className="block text-sm font-medium text-slate-700">Name</label>
                                 <input name="name" className="mt-2 w-full rounded-[5px] border border-slate-200 bg-white/80 px-4 py-3 text-sm" />
