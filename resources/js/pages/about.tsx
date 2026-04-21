@@ -1,15 +1,20 @@
 import { Head } from '@inertiajs/react';
-import { motion } from 'framer-motion';
+import ThinHero from '@/components/public/thin-hero';
 
 export default function AboutPage({ aboutContent }: { aboutContent: string }) {
     return (
         <>
             <Head title="About" />
-            <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="rounded-3xl border border-white/40 bg-white/65 p-8 shadow-xl backdrop-blur-xl md:p-12">
-                <p className="text-sm uppercase tracking-[0.25em] text-slate-500">About us</p>
-                <h1 className="mt-3 text-4xl font-bold tracking-tight text-slate-950">Who we are</h1>
-                <p className="mt-6 max-w-3xl whitespace-pre-line text-base leading-8 text-slate-700">{aboutContent}</p>
-            </motion.section>
+
+            <ThinHero
+                eyebrow="About us"
+                title="Who we are"
+                description="PollInsight Kenya delivers trusted, anonymous polling so communities can track political sentiment with clarity."
+            />
+
+            <section className="mt-6 rounded-3xl border border-white/40 bg-white/65 p-8 shadow-xl backdrop-blur-xl md:p-12">
+                <p className="max-w-3xl whitespace-pre-line text-base leading-8 text-slate-700">{aboutContent}</p>
+            </section>
         </>
     );
 }
