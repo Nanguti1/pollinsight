@@ -282,7 +282,7 @@
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-Bd8ugM58.css",
+    "file": "assets/app-BZIWR-68.css",
     "name": "app",
     "names": [
       "app.css"
@@ -291,7 +291,7 @@
     "isEntry": true
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-xVlYP4U7.js",
+    "file": "assets/app-BTGp-wi7.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
@@ -358,7 +358,7 @@
     ]
   },
   "resources/js/pages/admin/aspirants.tsx": {
-    "file": "assets/aspirants-E4IHC56X.js",
+    "file": "assets/aspirants-D0JTSyIU.js",
     "name": "aspirants",
     "src": "resources/js/pages/admin/aspirants.tsx",
     "isDynamicEntry": true,
@@ -369,7 +369,7 @@
     ]
   },
   "resources/js/pages/admin/constituencies.tsx": {
-    "file": "assets/constituencies-miAu42M-.js",
+    "file": "assets/constituencies-B-MOiwma.js",
     "name": "constituencies",
     "src": "resources/js/pages/admin/constituencies.tsx",
     "isDynamicEntry": true,
@@ -380,7 +380,7 @@
     ]
   },
   "resources/js/pages/admin/counties.tsx": {
-    "file": "assets/counties-R0yGexVB.js",
+    "file": "assets/counties-BMbxnwGu.js",
     "name": "counties",
     "src": "resources/js/pages/admin/counties.tsx",
     "isDynamicEntry": true,
@@ -415,7 +415,7 @@
     ]
   },
   "resources/js/pages/admin/political-parties.tsx": {
-    "file": "assets/political-parties-IHuEU5_v.js",
+    "file": "assets/political-parties-BjbLq8LS.js",
     "name": "political-parties",
     "src": "resources/js/pages/admin/political-parties.tsx",
     "isDynamicEntry": true,
@@ -437,7 +437,7 @@
     ]
   },
   "resources/js/pages/admin/polls.tsx": {
-    "file": "assets/polls-C9e8HG5S.js",
+    "file": "assets/polls-D0kRJqfa.js",
     "name": "polls",
     "src": "resources/js/pages/admin/polls.tsx",
     "isDynamicEntry": true,
@@ -459,7 +459,7 @@
     ]
   },
   "resources/js/pages/admin/wards.tsx": {
-    "file": "assets/wards-DYTcigWZ.js",
+    "file": "assets/wards-B9oS8oJ2.js",
     "name": "wards",
     "src": "resources/js/pages/admin/wards.tsx",
     "isDynamicEntry": true,
