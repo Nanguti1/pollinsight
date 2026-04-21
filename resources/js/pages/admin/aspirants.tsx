@@ -5,10 +5,12 @@ import { useMemo, useState } from 'react';
 type LocationOption = { id: number; name: string; county_id?: number; constituency_id?: number };
 
 type Position = { id: number; name: string };
+type PoliticalParty = { id: number; name: string; abbreviation?: string | null };
 
 export default function AdminAspirants({
     aspirants,
     positions,
+    politicalParties,
     counties,
     constituencies,
     wards,
@@ -18,6 +20,7 @@ export default function AdminAspirants({
 }: {
     aspirants: any[];
     positions: Position[];
+    politicalParties: PoliticalParty[];
     counties: LocationOption[];
     constituencies: LocationOption[];
     wards: LocationOption[];
@@ -99,7 +102,7 @@ export default function AdminAspirants({
                                     <img src={aspirant.photo_url || 'https://via.placeholder.com/96'} alt={aspirant.name} className="h-24 w-24 rounded-[5px] object-cover" />
                                     <div>
                                         <p className="text-lg font-semibold text-slate-950">{aspirant.name}</p>
-                                        <p className="mt-1 text-sm text-slate-600">{aspirant.party}</p>
+                                        <p className="mt-1 text-sm text-slate-600">{aspirant.political_party?.name || aspirant.party}</p>
                                         <p className="mt-2 text-sm text-slate-500">{aspirant.position?.name} • {aspirant.county?.name || aspirant.constituency?.name || aspirant.ward?.name || 'National'}</p>
                                     </div>
                                 </div>
@@ -120,8 +123,12 @@ export default function AdminAspirants({
                                 <input name="photo" type="file" accept="image/*" className="mt-2 w-full rounded-[5px] border border-slate-200 bg-white/80 px-4 py-3 text-sm" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700">Party</label>
-                                <input name="party" className="mt-2 w-full rounded-[5px] border border-slate-200 bg-white/80 px-4 py-3 text-sm" />
+                                <label className="block text-sm font-medium text-slate-700">Political party</label>
+                                <select name="political_party_id" className="mt-2 w-full rounded-[5px] border border-slate-200 bg-white/80 px-4 py-3 text-sm">
+                                    {politicalParties.map((party) => (
+                                        <option key={party.id} value={party.id}>{party.name}{party.abbreviation ? ` (${party.abbreviation})` : ''}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-700">Position</label>

@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BarChart3, BookOpen, LayoutGrid, MapPin, MapPinned, Users } from 'lucide-react';
+import { BarChart3, BookOpen, Flag, LayoutGrid, MapPin, MapPinned, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -40,6 +40,11 @@ const mainNavItems: NavItem[] = [
         title: 'Aspirants',
         href: '/admin/aspirants',
         icon: Users,
+    },
+    {
+        title: 'Political Parties',
+        href: '/admin/political-parties',
+        icon: Flag,
     },
     {
         title: 'Polls',

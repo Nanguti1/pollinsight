@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ConstituencyController;
 use App\Http\Controllers\Admin\CountyController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PollController;
+use App\Http\Controllers\Admin\PoliticalPartyController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\WardController;
 use App\Http\Controllers\Public\HomeController;
@@ -20,7 +21,7 @@ Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::redirect('/contacts', '/contact', 301);
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -48,6 +49,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('aspirants', [AspirantController::class, 'store'])->name('aspirants.store');
         Route::put('aspirants/{aspirant}', [AspirantController::class, 'update'])->name('aspirants.update');
         Route::delete('aspirants/{aspirant}', [AspirantController::class, 'destroy'])->name('aspirants.destroy');
+
+        Route::get('political-parties', [PoliticalPartyController::class, 'index'])->name('political-parties.index');
+        Route::post('political-parties', [PoliticalPartyController::class, 'store'])->name('political-parties.store');
+        Route::put('political-parties/{politicalParty}', [PoliticalPartyController::class, 'update'])->name('political-parties.update');
+        Route::delete('political-parties/{politicalParty}', [PoliticalPartyController::class, 'destroy'])->name('political-parties.destroy');
 
         Route::get('polls', [PollController::class, 'index'])->name('polls.index');
         Route::post('polls', [PollController::class, 'store'])->name('polls.store');

@@ -75,7 +75,7 @@ export default function Welcome({
                         className={`relative min-h-[440px] bg-gradient-to-r ${currentSlide.background}`}
                     >
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(56,189,248,0.25),transparent_45%)]" />
-                        <div className="relative mx-auto flex min-h-[440px] w-full max-w-6xl items-center px-8 py-12 md:px-14">
+                        <div className="relative mx-auto flex min-h-[440px] w-full max-w-7xl items-center px-6 py-12 md:px-10">
                             <div className="max-w-2xl text-white">
                                 <p className="text-sm uppercase tracking-[0.28em] text-white/70">PollInsight Kenya</p>
                                 <h1 className="mt-4 text-4xl font-semibold leading-tight md:text-6xl">{currentSlide.title}</h1>
@@ -146,7 +146,7 @@ export default function Welcome({
                 )}
             </section>
 
-            <section className="relative mt-16 overflow-hidden rounded-t-[140px] bg-[#15184B] px-6 py-16 text-white md:px-12">
+            <section className="relative mt-16 overflow-hidden rounded-t-[8px] bg-[#15184B] px-6 py-16 text-white md:px-12">
                 <div className="mx-auto max-w-5xl">
                     <h3 className="text-center text-5xl font-semibold">Get Started Now!</h3>
                     <p className="mt-4 text-center text-2xl text-white/80">Subscribe for poll updates and weekly insights.</p>

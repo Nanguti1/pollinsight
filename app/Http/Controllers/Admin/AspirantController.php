@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Aspirant;
 use App\Models\Constituency;
 use App\Models\County;
+use App\Models\PoliticalParty;
 use App\Models\Position;
 use App\Models\Ward;
 use App\Services\AspirantService;
@@ -27,7 +28,7 @@ class AspirantController extends Controller
         ]);
 
         $aspirants = Aspirant::query()
-            ->with(['position', 'county', 'constituency', 'ward'])
+            ->with(['position', 'politicalParty', 'county', 'constituency', 'ward'])
             ->when($filters['position_id'] ?? null, fn ($query, $positionId) => $query->where('position_id', $positionId))
             ->when($filters['county_id'] ?? null, fn ($query, $countyId) => $query->where('county_id', $countyId))
             ->when($filters['constituency_id'] ?? null, fn ($query, $constituencyId) => $query->where('constituency_id', $constituencyId))
@@ -61,6 +62,7 @@ class AspirantController extends Controller
         return Inertia::render('admin/aspirants', [
             'aspirants' => $aspirants,
             'positions' => Position::orderBy('level')->orderBy('name')->get(),
+            'politicalParties' => PoliticalParty::orderBy('name')->get(),
             'counties' => $counties,
             'constituencies' => $constituencies,
             'wards' => $wards,
@@ -75,7 +77,7 @@ class AspirantController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'photo' => 'nullable|image|max:4096',
-            'party' => 'required|string|max:255',
+            'political_party_id' => 'required|exists:political_parties,id',
             'position_id' => 'required|exists:positions,id',
             'county_id' => 'nullable|exists:counties,id',
             'constituency_id' => 'nullable|exists:constituencies,id',
@@ -83,6 +85,9 @@ class AspirantController extends Controller
             'bio' => 'nullable|string',
             'status' => 'required|in:active,inactive',
         ]);
+
+        $politicalParty = PoliticalParty::query()->findOrFail((int) $data['political_party_id']);
+        $data['party'] = $politicalParty->name;
 
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('aspirants', 'public');
@@ -98,7 +103,7 @@ class AspirantController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'photo' => 'nullable|image|max:4096',
-            'party' => 'required|string|max:255',
+            'political_party_id' => 'required|exists:political_parties,id',
             'position_id' => 'required|exists:positions,id',
             'county_id' => 'nullable|exists:counties,id',
             'constituency_id' => 'nullable|exists:constituencies,id',
@@ -106,6 +111,9 @@ class AspirantController extends Controller
             'bio' => 'nullable|string',
             'status' => 'required|in:active,inactive',
         ]);
+
+        $politicalParty = PoliticalParty::query()->findOrFail((int) $data['political_party_id']);
+        $data['party'] = $politicalParty->name;
 
         if ($request->hasFile('photo')) {
             if ($aspirant->photo && ! str_starts_with($aspirant->photo, 'http')) {
