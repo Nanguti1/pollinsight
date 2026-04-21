@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { useCallback, useState } from 'react';
 import PollCard from '@/components/public/poll-card';
+import ThinHero from '@/components/public/thin-hero';
 
 type Poll = {
     id: number;
@@ -45,8 +46,14 @@ export default function PollList({ polls, positions, counties, filters }: { poll
         <>
             <Head title="Polls" />
 
-            <section className="rounded-3xl border border-white/40 bg-white/65 p-8 shadow-xl backdrop-blur-xl">
-                <h1 className="text-3xl font-bold tracking-tight text-slate-950">Active polls</h1>
+            <ThinHero
+                eyebrow="Polls"
+                title="Vote in live polls"
+                description="Explore active polls across Nairobi and beyond, filter by position and county, then cast your vote in seconds."
+            />
+
+            <section className="mt-6 rounded-3xl border border-white/40 bg-white/65 p-8 shadow-xl backdrop-blur-xl">
+                <h2 className="text-2xl font-bold tracking-tight text-slate-950">Active polls</h2>
                 <p className="mt-2 text-slate-600">Filter live polls by position and county, then cast your vote.</p>
 
                 <form action="/polls" method="get" className="mt-6 grid gap-3 md:grid-cols-[1fr_1fr_auto]">

@@ -1,15 +1,21 @@
 import { Head } from '@inertiajs/react';
 import { motion } from 'framer-motion';
+import ThinHero from '@/components/public/thin-hero';
 
 export default function ContactsPage() {
     return (
         <>
             <Head title="Contact" />
-            <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+
+            <ThinHero
+                eyebrow="Contact"
+                title="Get in touch"
+                description="Reach out for partnerships, county onboarding, product feedback, or support for your polling initiative."
+            />
+
+            <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
                 <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="rounded-3xl border border-white/40 bg-white/65 p-8 shadow-xl backdrop-blur-xl">
-                    <p className="text-sm uppercase tracking-[0.25em] text-slate-500">Contact</p>
-                    <h1 className="mt-3 text-4xl font-bold tracking-tight text-slate-950">Get in touch</h1>
-                    <p className="mt-4 text-slate-600">We would love to hear from you. Reach out for partnerships, county onboarding, or product feedback.</p>
+                    <p className="text-sm text-slate-600">We would love to hear from you. Reach out for partnerships, county onboarding, or product feedback.</p>
 
                     <form className="mt-8 space-y-4">
                         <div>
