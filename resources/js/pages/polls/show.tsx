@@ -65,6 +65,16 @@ export default function PollShow({ poll, options, total_votes }: { poll: { id: n
                         {flash.success}
                     </motion.div>
                 )}
+                {flash.error && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        className="mt-6 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800"
+                    >
+                        {flash.error}
+                    </motion.div>
+                )}
             </AnimatePresence>
 
             <div className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">

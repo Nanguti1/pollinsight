@@ -29,6 +29,14 @@ class PublicPagesTest extends TestCase
             ->assertSee('Send message');
     }
 
+
+    public function test_avatar_fallback_endpoint_returns_jpeg_response(): void
+    {
+        $this->get('/avatar.jpg')
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/jpeg');
+    }
+
     public function test_about_page_uses_backend_content_value(): void
     {
         Cache::put('public.about.content', 'Managed from admin content section.');
