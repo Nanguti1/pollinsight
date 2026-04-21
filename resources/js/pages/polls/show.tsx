@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 export default function PollShow({ poll, options, total_votes }: { poll: { id: number; title: string; location: string }; options: any[]; total_votes: number }) {
-    const { flash } = usePage().props as any;
+    const { flash = {} } = (usePage().props as any) || {};
     const [fingerprint, setFingerprint] = useState('');
     const form = useForm({ poll_option_id: '', fingerprint: '' });
 
@@ -99,7 +99,7 @@ export default function PollShow({ poll, options, total_votes }: { poll: { id: n
                                         className="sr-only"
                                     />
                                     <div className="flex items-center gap-4">
-                                        <img src={option.aspirant.photo || 'https://via.placeholder.com/80'} alt={option.aspirant.name} className="h-16 w-16 rounded-2xl object-cover" />
+                                        <img src={option.aspirant.photo || '/avatar.jpg'} alt={option.aspirant.name} className="h-16 w-16 rounded-2xl object-cover" />
                                         <div>
                                             <p className="font-semibold">{option.aspirant.name}</p>
                                             <p className={`text-sm ${isSelected ? 'text-white/80' : 'text-slate-600'}`}>{option.aspirant.party}</p>

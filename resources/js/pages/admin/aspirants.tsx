@@ -99,7 +99,7 @@ export default function AdminAspirants({
                         <div className="mt-5 space-y-3">
                             {aspirants.map((aspirant) => (
                                 <div key={aspirant.id} className="grid gap-3 rounded-[5px] bg-white/60 p-4 shadow-sm sm:grid-cols-[auto_1fr]">
-                                    <img src={aspirant.photo_url || 'https://via.placeholder.com/96'} alt={aspirant.name} className="h-24 w-24 rounded-[5px] object-cover" />
+                                    <img src={aspirant.photo_url || '/avatar.jpg'} alt={aspirant.name} className="h-24 w-24 rounded-[5px] object-cover" />
                                     <div>
                                         <p className="text-lg font-semibold text-slate-950">{aspirant.name}</p>
                                         <p className="mt-1 text-sm text-slate-600">{aspirant.political_party?.name || aspirant.party}</p>
