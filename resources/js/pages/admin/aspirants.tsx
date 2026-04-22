@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
 
@@ -51,6 +51,14 @@ export default function AdminAspirants({
         return source.filter((item) => item.name.toLowerCase().includes(wardSearch.toLowerCase()));
     }, [allWards, selectedConstituency, wardSearch]);
 
+    const filtersForm = useForm({
+        position_id: filters.position_id ? String(filters.position_id) : '',
+        county_id: filters.county_id ? String(filters.county_id) : '',
+        constituency_id: filters.constituency_id ? String(filters.constituency_id) : '',
+        ward_id: filters.ward_id ? String(filters.ward_id) : '',
+        status: filters.status ?? '',
+    });
+
     const visibleAspirants = useMemo(() => {
         if (!listSearch) {
             return aspirants;
@@ -70,32 +78,38 @@ export default function AdminAspirants({
 
                 <motion.section className="rounded-[5px] border border-white/10 bg-slate-950/5 p-6 shadow-sm backdrop-blur-xl">
                     <h2 className="text-xl font-semibold text-slate-950">Filter aspirants</h2>
-                    <form action="/admin/aspirants" method="get" className="mt-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
-                        <select name="position_id" defaultValue={filters.position_id ?? ''} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
+                    <form
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            filtersForm.get('/admin/aspirants', { preserveState: true, preserveScroll: true });
+                        }}
+                        className="mt-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6"
+                    >
+                        <select name="position_id" value={filtersForm.data.position_id} onChange={(event) => filtersForm.setData('position_id', event.target.value)} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
                             <option value="">All positions</option>
                             {positions.map((position) => (
                                 <option key={position.id} value={position.id}>{position.name}</option>
                             ))}
                         </select>
-                        <select name="county_id" defaultValue={filters.county_id ?? ''} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
+                        <select name="county_id" value={filtersForm.data.county_id} onChange={(event) => filtersForm.setData('county_id', event.target.value)} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
                             <option value="">All counties</option>
                             {counties.map((county) => (
                                 <option key={county.id} value={county.id}>{county.name}</option>
                             ))}
                         </select>
-                        <select name="constituency_id" defaultValue={filters.constituency_id ?? ''} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
+                        <select name="constituency_id" value={filtersForm.data.constituency_id} onChange={(event) => filtersForm.setData('constituency_id', event.target.value)} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
                             <option value="">All constituencies</option>
                             {constituencies.map((item) => (
                                 <option key={item.id} value={item.id}>{item.name}</option>
                             ))}
                         </select>
-                        <select name="ward_id" defaultValue={filters.ward_id ?? ''} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
+                        <select name="ward_id" value={filtersForm.data.ward_id} onChange={(event) => filtersForm.setData('ward_id', event.target.value)} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
                             <option value="">All wards</option>
                             {wards.map((item) => (
                                 <option key={item.id} value={item.id}>{item.name}</option>
                             ))}
                         </select>
-                        <select name="status" defaultValue={filters.status ?? ''} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
+                        <select name="status" value={filtersForm.data.status} onChange={(event) => filtersForm.setData('status', event.target.value)} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
                             <option value="">Any status</option>
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>

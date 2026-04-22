@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { useCallback, useState } from 'react';
 import PollCard from '@/components/public/poll-card';
@@ -16,6 +16,10 @@ export default function PollList({ polls, positions, counties, filters }: { poll
     const [availablePositions, setAvailablePositions] = useState(positions);
     const [availableCounties, setAvailableCounties] = useState(counties);
     const [hasLoadedFilterOptions, setHasLoadedFilterOptions] = useState(positions.length > 0 && counties.length > 0);
+    const filtersForm = useForm({
+        position_id: filters.position_id ? String(filters.position_id) : '',
+        county_id: filters.county_id ? String(filters.county_id) : '',
+    });
 
     const loadFilterOptions = useCallback(async () => {
         if (hasLoadedFilterOptions) {
@@ -56,14 +60,32 @@ export default function PollList({ polls, positions, counties, filters }: { poll
                 <h2 className="text-2xl font-bold tracking-tight text-slate-950">Active polls</h2>
                 <p className="mt-2 text-slate-600">Filter live polls by position and county, then cast your vote.</p>
 
-                <form action="/polls" method="get" className="mt-6 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
-                    <select name="position_id" defaultValue={filters.position_id ?? ''} onFocus={() => void loadFilterOptions()} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
+                <form
+                    onSubmit={(event) => {
+                        event.preventDefault();
+                        filtersForm.get('/polls', { preserveState: true, preserveScroll: true });
+                    }}
+                    className="mt-6 grid gap-3 md:grid-cols-[1fr_1fr_auto]"
+                >
+                    <select
+                        name="position_id"
+                        value={filtersForm.data.position_id}
+                        onChange={(event) => filtersForm.setData('position_id', event.target.value)}
+                        onFocus={() => void loadFilterOptions()}
+                        className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900"
+                    >
                         <option value="">All positions</option>
                         {availablePositions.map((position) => (
                             <option key={position.id} value={position.id}>{position.name}</option>
                         ))}
                     </select>
-                    <select name="county_id" defaultValue={filters.county_id ?? ''} onFocus={() => void loadFilterOptions()} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
+                    <select
+                        name="county_id"
+                        value={filtersForm.data.county_id}
+                        onChange={(event) => filtersForm.setData('county_id', event.target.value)}
+                        onFocus={() => void loadFilterOptions()}
+                        className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900"
+                    >
                         <option value="">All counties</option>
                         {availableCounties.map((county) => (
                             <option key={county.id} value={county.id}>{county.name}</option>
