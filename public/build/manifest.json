@@ -291,7 +291,7 @@
     "isEntry": true
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-BTGp-wi7.js",
+    "file": "assets/app-WMRhWuCZ.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
@@ -358,7 +358,7 @@
     ]
   },
   "resources/js/pages/admin/aspirants.tsx": {
-    "file": "assets/aspirants-D0JTSyIU.js",
+    "file": "assets/aspirants-Qc3qSggo.js",
     "name": "aspirants",
     "src": "resources/js/pages/admin/aspirants.tsx",
     "isDynamicEntry": true,
@@ -437,7 +437,7 @@
     ]
   },
   "resources/js/pages/admin/polls.tsx": {
-    "file": "assets/polls-D0kRJqfa.js",
+    "file": "assets/polls-B1xutwtZ.js",
     "name": "polls",
     "src": "resources/js/pages/admin/polls.tsx",
     "isDynamicEntry": true,
@@ -616,7 +616,7 @@
     ]
   },
   "resources/js/pages/polls/index.tsx": {
-    "file": "assets/polls-BzEkAcIf.js",
+    "file": "assets/polls-BkBZftg9.js",
     "name": "polls",
     "src": "resources/js/pages/polls/index.tsx",
     "isDynamicEntry": true,
@@ -643,7 +643,7 @@
     ]
   },
   "resources/js/pages/rankings/index.tsx": {
-    "file": "assets/rankings-D7hspCgb.js",
+    "file": "assets/rankings-40IhFAvG.js",
     "name": "rankings",
     "src": "resources/js/pages/rankings/index.tsx",
     "isDynamicEntry": true,
