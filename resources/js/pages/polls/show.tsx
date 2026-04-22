@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 export default function PollShow({ poll, options, total_votes }: { poll: { id: number; title: string; location: string }; options: any[]; total_votes: number }) {
-    const { flash } = usePage().props as any;
+    const { flash = {} } = (usePage().props as any) || {};
     const [fingerprint, setFingerprint] = useState('');
     const form = useForm({ poll_option_id: '', fingerprint: '' });
 
