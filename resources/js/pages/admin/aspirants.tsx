@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
 
@@ -30,9 +30,12 @@ export default function AdminAspirants({
 }) {
     const [selectedCounty, setSelectedCounty] = useState<string>('');
     const [selectedConstituency, setSelectedConstituency] = useState<string>('');
+    const [selectedCreateWard, setSelectedCreateWard] = useState<string>('');
     const [countySearch, setCountySearch] = useState('');
     const [constituencySearch, setConstituencySearch] = useState('');
     const [wardSearch, setWardSearch] = useState('');
+    const [listSearch, setListSearch] = useState('');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
     const filteredCounties = useMemo(() => counties.filter((item) => item.name.toLowerCase().includes(countySearch.toLowerCase())), [counties, countySearch]);
 
@@ -48,6 +51,22 @@ export default function AdminAspirants({
         return source.filter((item) => item.name.toLowerCase().includes(wardSearch.toLowerCase()));
     }, [allWards, selectedConstituency, wardSearch]);
 
+    const filtersForm = useForm({
+        position_id: filters.position_id ? String(filters.position_id) : '',
+        county_id: filters.county_id ? String(filters.county_id) : '',
+        constituency_id: filters.constituency_id ? String(filters.constituency_id) : '',
+        ward_id: filters.ward_id ? String(filters.ward_id) : '',
+        status: filters.status ?? '',
+    });
+
+    const visibleAspirants = useMemo(() => {
+        if (!listSearch) {
+            return aspirants;
+        }
+
+        return aspirants.filter((aspirant) => `${aspirant.name} ${aspirant.position?.name || ''} ${aspirant.county?.name || ''} ${aspirant.constituency?.name || ''} ${aspirant.ward?.name || ''}`.toLowerCase().includes(listSearch.toLowerCase()));
+    }, [aspirants, listSearch]);
+
     return (
         <>
             <Head title="Aspirants" />
@@ -59,32 +78,38 @@ export default function AdminAspirants({
 
                 <motion.section className="rounded-[5px] border border-white/10 bg-slate-950/5 p-6 shadow-sm backdrop-blur-xl">
                     <h2 className="text-xl font-semibold text-slate-950">Filter aspirants</h2>
-                    <form action="/admin/aspirants" method="get" className="mt-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
-                        <select name="position_id" defaultValue={filters.position_id ?? ''} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
+                    <form
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            filtersForm.get('/admin/aspirants', { preserveState: true, preserveScroll: true });
+                        }}
+                        className="mt-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6"
+                    >
+                        <select name="position_id" value={filtersForm.data.position_id} onChange={(event) => filtersForm.setData('position_id', event.target.value)} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
                             <option value="">All positions</option>
                             {positions.map((position) => (
                                 <option key={position.id} value={position.id}>{position.name}</option>
                             ))}
                         </select>
-                        <select name="county_id" defaultValue={filters.county_id ?? ''} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
+                        <select name="county_id" value={filtersForm.data.county_id} onChange={(event) => filtersForm.setData('county_id', event.target.value)} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
                             <option value="">All counties</option>
                             {counties.map((county) => (
                                 <option key={county.id} value={county.id}>{county.name}</option>
                             ))}
                         </select>
-                        <select name="constituency_id" defaultValue={filters.constituency_id ?? ''} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
+                        <select name="constituency_id" value={filtersForm.data.constituency_id} onChange={(event) => filtersForm.setData('constituency_id', event.target.value)} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
                             <option value="">All constituencies</option>
                             {constituencies.map((item) => (
                                 <option key={item.id} value={item.id}>{item.name}</option>
                             ))}
                         </select>
-                        <select name="ward_id" defaultValue={filters.ward_id ?? ''} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
+                        <select name="ward_id" value={filtersForm.data.ward_id} onChange={(event) => filtersForm.setData('ward_id', event.target.value)} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
                             <option value="">All wards</option>
                             {wards.map((item) => (
                                 <option key={item.id} value={item.id}>{item.name}</option>
                             ))}
                         </select>
-                        <select name="status" defaultValue={filters.status ?? ''} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
+                        <select name="status" value={filtersForm.data.status} onChange={(event) => filtersForm.setData('status', event.target.value)} className="rounded-[5px] border border-slate-200 bg-white px-4 py-3 text-sm">
                             <option value="">Any status</option>
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
@@ -95,16 +120,66 @@ export default function AdminAspirants({
 
                 <div className="grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
                     <motion.section className="rounded-[5px] border border-white/10 bg-slate-950/5 p-6 shadow-sm backdrop-blur-xl">
-                        <h2 className="text-xl font-semibold text-slate-950">Active aspirants</h2>
+                        <div className="flex items-center justify-between gap-3">
+                            <h2 className="text-xl font-semibold text-slate-950">Aspirants</h2>
+                            <input value={listSearch} onChange={(event) => setListSearch(event.target.value)} placeholder="Search aspirant" className="rounded-[5px] border border-slate-200 bg-white px-3 py-2 text-sm" />
+                        </div>
                         <div className="mt-5 space-y-3">
-                            {aspirants.map((aspirant) => (
-                                <div key={aspirant.id} className="grid gap-3 rounded-[5px] bg-white/60 p-4 shadow-sm sm:grid-cols-[auto_1fr]">
-                                    <img src={aspirant.photo_url || 'https://via.placeholder.com/96'} alt={aspirant.name} className="h-24 w-24 rounded-[5px] object-cover" />
-                                    <div>
-                                        <p className="text-lg font-semibold text-slate-950">{aspirant.name}</p>
-                                        <p className="mt-1 text-sm text-slate-600">{aspirant.political_party?.name || aspirant.party}</p>
-                                        <p className="mt-2 text-sm text-slate-500">{aspirant.position?.name} • {aspirant.county?.name || aspirant.constituency?.name || aspirant.ward?.name || 'National'}</p>
+                            {visibleAspirants.map((aspirant) => (
+                                <div key={aspirant.id} className="rounded-[5px] bg-white/60 p-4 shadow-sm">
+                                    <div className="grid gap-3 sm:grid-cols-[auto_1fr]">
+                                        <img src={aspirant.photo_url || '/avatar.jpg'} alt={aspirant.name} className="h-24 w-24 rounded-[5px] object-cover" />
+                                        <div>
+                                            <p className="text-lg font-semibold text-slate-950">{aspirant.name}</p>
+                                            <p className="mt-1 text-sm text-slate-600">{aspirant.political_party?.name || aspirant.party}</p>
+                                            <p className="mt-2 text-sm text-slate-500">{aspirant.position?.name} • {aspirant.county?.name || aspirant.constituency?.name || aspirant.ward?.name || 'National'}</p>
+                                        </div>
                                     </div>
+                                    <details className="mt-3">
+                                        <summary className="cursor-pointer text-sm font-semibold text-slate-700">Edit aspirant</summary>
+                                        <form action={`/admin/aspirants/${aspirant.id}`} method="post" className="mt-3 space-y-3" encType="multipart/form-data">
+                                            <input type="hidden" name="_token" value={csrfToken} />
+                                            <input type="hidden" name="_method" value="put" />
+                                            <input name="name" defaultValue={aspirant.name} className="w-full rounded-[5px] border border-slate-200 bg-white px-3 py-2 text-sm" />
+                                            <select name="political_party_id" defaultValue={aspirant.political_party_id} className="w-full rounded-[5px] border border-slate-200 bg-white px-3 py-2 text-sm">
+                                                {politicalParties.map((party) => (
+                                                    <option key={party.id} value={party.id}>{party.name}</option>
+                                                ))}
+                                            </select>
+                                            <select name="position_id" defaultValue={aspirant.position_id} className="w-full rounded-[5px] border border-slate-200 bg-white px-3 py-2 text-sm">
+                                                {positions.map((position) => (
+                                                    <option key={position.id} value={position.id}>{position.name}</option>
+                                                ))}
+                                            </select>
+                                            <select name="county_id" defaultValue={aspirant.county_id || ''} className="w-full rounded-[5px] border border-slate-200 bg-white px-3 py-2 text-sm">
+                                                <option value="">None</option>
+                                                {counties.map((county) => (
+                                                    <option key={county.id} value={county.id}>{county.name}</option>
+                                                ))}
+                                            </select>
+                                            <select name="constituency_id" defaultValue={aspirant.constituency_id || ''} className="w-full rounded-[5px] border border-slate-200 bg-white px-3 py-2 text-sm">
+                                                <option value="">None</option>
+                                                {allConstituencies.map((item) => (
+                                                    <option key={item.id} value={item.id}>{item.name}</option>
+                                                ))}
+                                            </select>
+                                            <select name="ward_id" defaultValue={aspirant.ward_id || ''} className="w-full rounded-[5px] border border-slate-200 bg-white px-3 py-2 text-sm">
+                                                <option value="">None</option>
+                                                {allWards.map((item) => (
+                                                    <option key={item.id} value={item.id}>{item.name}</option>
+                                                ))}
+                                            </select>
+                                            <select name="status" defaultValue={aspirant.status} className="w-full rounded-[5px] border border-slate-200 bg-white px-3 py-2 text-sm">
+                                                <option value="active">Active</option>
+                                                <option value="inactive">Inactive</option>
+                                            </select>
+                                            <textarea name="bio" defaultValue={aspirant.bio || ''} rows={3} className="w-full rounded-[5px] border border-slate-200 bg-white px-3 py-2 text-sm" />
+                                            <div className="flex justify-end gap-2">
+                                                <button type="submit" className="rounded-[5px] bg-slate-950 px-3 py-1.5 text-xs font-semibold text-white">Save</button>
+                                                <button formAction={`/admin/aspirants/${aspirant.id}`} formMethod="post" name="_method" value="delete" className="rounded-[5px] border border-rose-300 px-3 py-1.5 text-xs font-semibold text-rose-600">Delete</button>
+                                            </div>
+                                        </form>
+                                    </details>
                                 </div>
                             ))}
                         </div>
@@ -113,7 +188,7 @@ export default function AdminAspirants({
                     <motion.section className="rounded-[5px] border border-white/10 bg-white/60 p-6 shadow-sm backdrop-blur-xl">
                         <h2 className="text-xl font-semibold text-slate-950">Add new aspirant</h2>
                         <form action="/admin/aspirants" method="post" encType="multipart/form-data" className="mt-6 space-y-4">
-                            <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''} />
+                            <input type="hidden" name="_token" value={csrfToken} />
                             <div>
                                 <label className="block text-sm font-medium text-slate-700">Full name</label>
                                 <input name="name" className="mt-2 w-full rounded-[5px] border border-slate-200 bg-white/80 px-4 py-3 text-sm" />
@@ -165,6 +240,7 @@ export default function AdminAspirants({
                                     onChange={(event) => {
                                         setSelectedCounty(event.target.value);
                                         setSelectedConstituency('');
+                                        setSelectedCreateWard('');
                                     }}
                                     className="mt-2 w-full rounded-[5px] border border-slate-200 bg-white/80 px-4 py-3 text-sm"
                                 >
@@ -179,7 +255,10 @@ export default function AdminAspirants({
                                 <select
                                     name="constituency_id"
                                     value={selectedConstituency}
-                                    onChange={(event) => setSelectedConstituency(event.target.value)}
+                                    onChange={(event) => {
+                                        setSelectedConstituency(event.target.value);
+                                        setSelectedCreateWard('');
+                                    }}
                                     className="mt-2 w-full rounded-[5px] border border-slate-200 bg-white/80 px-4 py-3 text-sm"
                                 >
                                     <option value="">None</option>
@@ -190,7 +269,7 @@ export default function AdminAspirants({
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-700">Ward</label>
-                                <select name="ward_id" className="mt-2 w-full rounded-[5px] border border-slate-200 bg-white/80 px-4 py-3 text-sm">
+                                <select name="ward_id" value={selectedCreateWard} onChange={(event) => setSelectedCreateWard(event.target.value)} className="mt-2 w-full rounded-[5px] border border-slate-200 bg-white/80 px-4 py-3 text-sm">
                                     <option value="">None</option>
                                     {createWards.map((item) => (
                                         <option key={item.id} value={item.id}>{item.name}</option>

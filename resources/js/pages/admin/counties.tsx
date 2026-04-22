@@ -2,12 +2,13 @@ import { Head } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
 
-const priorityCounties = ["nairobi", "mombasa", "kiambu", "kajiado", "nakuru", "kisumu", "murang'a", "machokosi", 'machakos'];
+const priorityCounties = ['nairobi city', 'mombasa', 'kiambu', 'kajiado', 'nakuru', 'kisumu', "murang'a", 'machakos'];
 
 export default function AdminCounties({ counties }: { counties: any[] }) {
     const [search, setSearch] = useState('');
     const [query, setQuery] = useState('');
     const [showMore, setShowMore] = useState(false);
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
     const filteredCounties = useMemo(() => {
         if (query) {
@@ -47,8 +48,18 @@ export default function AdminCounties({ counties }: { counties: any[] }) {
                         <div className="mt-5 grid gap-3">
                             {filteredCounties.map((county: any) => (
                                 <div key={county.id} className="rounded-[5px] bg-white/60 p-4 shadow-sm">
-                                    <p className="font-semibold text-slate-950">{county.name}</p>
-                                    <p className="mt-1 text-sm text-slate-600">{county.constituencies?.length ?? 0} constituencies</p>
+                                    <form action={`/admin/counties/${county.id}`} method="post" className="space-y-3">
+                                        <input type="hidden" name="_token" value={csrfToken} />
+                                        <input type="hidden" name="_method" value="put" />
+                                        <input defaultValue={county.name} name="name" className="w-full rounded-[5px] border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-950" />
+                                        <div className="flex items-center justify-between gap-2">
+                                            <p className="text-sm text-slate-600">{county.constituencies?.length ?? 0} constituencies</p>
+                                            <div className="flex gap-2">
+                                                <button type="submit" className="rounded-[5px] bg-slate-950 px-3 py-1.5 text-xs font-semibold text-white">Save</button>
+                                                <button formAction={`/admin/counties/${county.id}`} formMethod="post" name="_method" value="delete" className="rounded-[5px] border border-rose-300 px-3 py-1.5 text-xs font-semibold text-rose-600">Delete</button>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             ))}
                         </div>
@@ -62,7 +73,7 @@ export default function AdminCounties({ counties }: { counties: any[] }) {
                     <motion.section layout className="rounded-[5px] border border-white/10 bg-white/60 p-6 shadow-sm backdrop-blur-xl">
                         <h2 className="text-xl font-semibold text-slate-950">Add new county</h2>
                         <form action="/admin/counties" method="post" className="mt-6 space-y-4">
-                            <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''} />
+                            <input type="hidden" name="_token" value={csrfToken} />
                             <div>
                                 <label className="block text-sm font-medium text-slate-700">Name</label>
                                 <input name="name" className="mt-2 w-full rounded-[5px] border border-slate-200 bg-white/80 px-4 py-3 text-sm" />

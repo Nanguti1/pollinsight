@@ -16,6 +16,16 @@ use App\Http\Controllers\Public\VoteController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/avatar.jpg', static function () {
+    $avatar = '/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxAQEBAQEA8QDw8PDw8PDw8PDw8PDw8PFREWFhURFRUYHSggGBolGxUVITEhJSkrLi4uFx8zODMtNygtLisBCgoKDg0OGxAQGy0lICYtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAAEAAgMBIgACEQEDEQH/xAAXAAADAQAAAAAAAAAAAAAAAAAAAQID/8QAFhABAQEAAAAAAAAAAAAAAAAAAAEC/9oADAMBAAIQAxAAAAH0A//EABQQAQAAAAAAAAAAAAAAAAAAACD/2gAIAQEAAQUCSP/EABQRAQAAAAAAAAAAAAAAAAAAACD/2gAIAQMBAT8BJ//EABQRAQAAAAAAAAAAAAAAAAAAACD/2gAIAQIBAT8BJ//Z';
+
+    return response(base64_decode($avatar), 200, [
+        'Content-Type' => 'image/jpeg',
+        'Cache-Control' => 'public, max-age=31536000',
+    ]);
+})->name('avatar.fallback');
+
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::redirect('/contacts', '/contact', 301);
@@ -66,7 +76,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::get('polls', [PublicPollController::class, 'index'])->name('polls.index');
 Route::get('polls/filter-options', [PublicPollController::class, 'filterOptions'])->name('polls.filter-options');
 Route::get('polls/{poll}', [PublicPollController::class, 'show'])->name('polls.show');
-Route::post('polls/{poll}/vote', [VoteController::class, 'store'])->middleware('throttle:votes,10,1')->name('polls.vote');
+Route::post('polls/{poll}/vote', [VoteController::class, 'store'])->middleware('throttle:votes')->name('polls.vote');
 Route::get('rankings', [RankingController::class, 'index'])->name('rankings.index');
 
 require __DIR__.'/settings.php';

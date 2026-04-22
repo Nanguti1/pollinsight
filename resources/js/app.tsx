@@ -7,7 +7,7 @@ import AuthLayout from '@/layouts/auth-layout';
 import PublicLayout from '@/layouts/public/layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'Pollin Sight-KE';
 const publicPages = ['welcome', 'about', 'contacts', 'polls/', 'rankings/'];
 
 createInertiaApp({

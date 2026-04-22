@@ -1,7 +1,14 @@
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 
 export default function RankingsIndex({ rankings, positions, counties, constituencies, wards, filters }: { rankings: any[]; positions: any[]; counties: any[]; constituencies: any[]; wards: any[]; filters: any }) {
+    const filtersForm = useForm({
+        position_id: filters.position_id ? String(filters.position_id) : '',
+        county_id: filters.county_id ? String(filters.county_id) : '',
+        constituency_id: filters.constituency_id ? String(filters.constituency_id) : '',
+        ward_id: filters.ward_id ? String(filters.ward_id) : '',
+    });
+
     return (
         <>
             <Head title="Rankings" />
@@ -10,26 +17,32 @@ export default function RankingsIndex({ rankings, positions, counties, constitue
                 <h1 className="text-3xl font-bold tracking-tight text-slate-950">Rankings</h1>
                 <p className="mt-2 text-slate-600">Compare aspirants by live vote totals across locations and positions.</p>
 
-                <form action="/rankings" method="get" className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                    <select name="position_id" defaultValue={filters.position_id ?? ''} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
+                <form
+                    onSubmit={(event) => {
+                        event.preventDefault();
+                        filtersForm.get('/rankings', { preserveState: true, preserveScroll: true });
+                    }}
+                    className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5"
+                >
+                    <select name="position_id" value={filtersForm.data.position_id} onChange={(event) => filtersForm.setData('position_id', event.target.value)} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
                         <option value="">All positions</option>
                         {positions.map((position) => (
                             <option key={position.id} value={position.id}>{position.name}</option>
                         ))}
                     </select>
-                    <select name="county_id" defaultValue={filters.county_id ?? ''} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
+                    <select name="county_id" value={filtersForm.data.county_id} onChange={(event) => filtersForm.setData('county_id', event.target.value)} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
                         <option value="">All counties</option>
                         {counties.map((county) => (
                             <option key={county.id} value={county.id}>{county.name}</option>
                         ))}
                     </select>
-                    <select name="constituency_id" defaultValue={filters.constituency_id ?? ''} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
+                    <select name="constituency_id" value={filtersForm.data.constituency_id} onChange={(event) => filtersForm.setData('constituency_id', event.target.value)} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
                         <option value="">All constituencies</option>
                         {constituencies.map((item) => (
                             <option key={item.id} value={item.id}>{item.name}</option>
                         ))}
                     </select>
-                    <select name="ward_id" defaultValue={filters.ward_id ?? ''} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
+                    <select name="ward_id" value={filtersForm.data.ward_id} onChange={(event) => filtersForm.setData('ward_id', event.target.value)} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
                         <option value="">All wards</option>
                         {wards.map((item) => (
                             <option key={item.id} value={item.id}>{item.name}</option>

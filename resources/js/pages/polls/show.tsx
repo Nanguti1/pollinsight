@@ -65,6 +65,16 @@ export default function PollShow({ poll, options, total_votes }: { poll: { id: n
                         {flash.success}
                     </motion.div>
                 )}
+                {flash.error && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        className="mt-6 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800"
+                    >
+                        {flash.error}
+                    </motion.div>
+                )}
             </AnimatePresence>
 
             <div className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
@@ -99,7 +109,7 @@ export default function PollShow({ poll, options, total_votes }: { poll: { id: n
                                         className="sr-only"
                                     />
                                     <div className="flex items-center gap-4">
-                                        <img src={option.aspirant.photo || 'https://via.placeholder.com/80'} alt={option.aspirant.name} className="h-16 w-16 rounded-2xl object-cover" />
+                                        <img src={option.aspirant.photo || '/avatar.jpg'} alt={option.aspirant.name} className="h-16 w-16 rounded-2xl object-cover" />
                                         <div>
                                             <p className="font-semibold">{option.aspirant.name}</p>
                                             <p className={`text-sm ${isSelected ? 'text-white/80' : 'text-slate-600'}`}>{option.aspirant.party}</p>
